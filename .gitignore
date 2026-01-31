@@ -1,4 +1,296 @@
+-- omamilch V5: Animated Red Star & Hemp Edition
+local player = game.Players.LocalPlayer
+local userInput = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
+local voiceService = game:GetService("VoiceChatService")
+
+-- Plattform-Erkennung
+local isMobile = userInput.TouchEnabled and not userInput.KeyboardEnabled
+
+-- GUI Design Settings
+local theme = {
+    bg = Color3.fromRGB(0, 0, 0),
+    trans = 0.3,
+    border = Color3.fromRGB(150, 0, 255), -- Lila Rand
+    stars = Color3.fromRGB(255, 0, 0), -- Rote Sterne
+    hempLeaf = Color3.fromRGB(255, 0, 0) -- Rote Hanfblätter
+}
+
+local screenGui = Instance.new("ScreenGui", game.CoreGui)
+screenGui.Name = "omamilchV5"
+
+-- Hilfsfunktion für Fenster
+local function createBaseFrame(name, size, pos)
+    local f = Instance.new("Frame")
+    f.Name = name
+    f.Size = size
+    f.Position = pos
+    f.BackgroundColor3 = theme.bg
+    f.BackgroundTransparency = theme.trans
+    f.BorderSizePixel = 2
+    f.BorderColor3 = theme.border
+    f.Active = true
+    f.Draggable = true
+    
+    -- Dynamischer Hintergrund für Hanfblätter & Sterne
+    local dynamicBg = Instance.new("Frame", f)
+    dynamicBg.Size = UDim2.new(1, 0, 1, 0)
+    dynamicBg.BackgroundTransparency = 1
+    dynamicBg.ZIndex = 0
+
+    local stars = Instance.new("TextLabel", dynamicBg)
+    stars.Size = UDim2.new(1.5, 0, 1.5, 0) -- Größer für Bewegung
+    stars.Position = UDim2.new(-0.25, 0, -0.25, 0)
+    stars.BackgroundTransparency = 1
+    stars.Text = "★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆"
+    stars.TextColor3 = theme.stars
+    stars.TextWrapped = true
+    stars.TextTransparency = 0.7
+    stars.Font = Enum.Font.SourceSansBold
+    stars.TextScaled = true
+
+    -- Hanfblatt-Symbole (verwenden wir ein Unicode-Zeichen oder generische Blätter)
+    -- Da ein echtes Hanfblatt-Symbol nicht immer renderbar ist, nutzen wir ein stilisiertes Blatt
+    local hempLeaves = Instance.new("TextLabel", dynamicBg)
+    hempLeaves.Size = UDim2.new(1.5, 0, 1.5, 0) -- Größer für Bewegung
+    hempLeaves.Position = UDim2.new(-0.25, 0, -0.25, 0)
+    hempLeaves.BackgroundTransparency = 1
+    hempLeaves.Text = "🍁 🌿 🍁 🌿 🍁 🌿 🍁 🌿 🍁 🌿 🍁 🌿" -- Stilisiertes Blatt
+    hempLeaves.TextColor3 = theme.hempLeaf
+    hempLeaves.TextWrapped = true
+    hempLeaves.TextTransparency = 0.7
+    hempLeaves.Font = Enum.Font.SourceSansBold
+    hempLeaves.TextScaled = true
+    
+    -- Animation Logic
+    local offset = 0
+    task.spawn(function()
+        while f.Parent do
+            offset = (offset + 0.005) % 1 -- Bewegung nach rechts
+            stars.Position = UDim2.new(offset - 0.25, 0, -0.25, 0)
+            hempLeaves.Position = UDim2.new(-offset - 0.25, 0, -0.25, 0) -- Bewegung nach links
+            task.wait(0.05)
+        end
+    end)
+
+    return f
+end
+
+-- HAUPTFENSTER
+-- Standardmäßig in der Mitte
+local mainFrame = createBaseFrame("Main", UDim2.new(0, 220, 0, 300), UDim2.new(0.5, -110, 0.5, -150))
+mainFrame.Parent = screenGui
+
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(0.8, 0, 0, 30)
+title.Text = "omamilch V5 - " .. (isMobile and "Mobile" or "PC")
+title.TextColor3 = Color3.new(1, 1, 1)
+title.BackgroundColor3 = theme.border -- Lila Hintergrund für Titel
+title.BackgroundTransparency = 0.5
+
+-- Schließen & Minimieren
+local closeBtn = Instance.new("TextButton", mainFrame)
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -30, 0, 0)
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.BackgroundColor3 = Color3.new(0.7, 0, 0)
+closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
+
+local hideBtn = Instance.new("TextButton", mainFrame)
+hideBtn.Size = UDim2.new(0, 30, 0, 30)
+hideBtn.Position = UDim2.new(1, -60, 0, 0)
+hideBtn.Text = "▼"
+hideBtn.TextColor3 = Color3.new(1, 1, 1)
+hideBtn.BackgroundTransparency = 1
+
+local container = Instance.new("ScrollingFrame", mainFrame)
+container.Size = UDim2.new(1, -10, 0.85, -10)
+container.Position = UDim2.new(0, 5, 0.12, 5)
+container.BackgroundTransparency = 1
+container.CanvasSize = UDim2.new(0, 0, 2, 0)
+Instance.new("UIListLayout", container).Padding = UDim.new(0, 5)
+
+hideBtn.MouseButton1Click:Connect(function()
+    container.Visible = not container.Visible
+    mainFrame.Size = container.Visible and UDim2.new(0, 220, 0, 300) or UDim2.new(0, 220, 0, 30)
+    hideBtn.Text = container.Visible and "▼" or "▲"
+end)
 
 
+-- PLAYER LIST FENSTER
+local tpFrame = createBaseFrame("PlayerMenu", UDim2.new(0, 220, 0, 300), UDim2.new(0.5, -110, 0.5, -150))
+tpFrame.Parent = screenGui
+tpFrame.Visible = false
 
-do local Players=game:GetService("Players");local UserInputService=game:GetService("UserInputService");local RunService=game:GetService("RunService");local TweenService=game:GetService("TweenService");local LocalPlayer=Players.LocalPlayer;local Gui=Instance.new("ScreenGui");Gui.Name="omamilch_V5_Final";Gui.ResetOnSpawn=false;Gui.Parent=LocalPlayer:WaitForChild("PlayerGui");local function applyStars(parent) local starContainer=Instance.new("Frame");starContainer.Size=UDim2.new(1,0,1,0);starContainer.BackgroundTransparency=1;starContainer.ClipsDescendants=true;starContainer.ZIndex=1;starContainer.Parent=parent;task.spawn(function() while task.wait(0.2) do if parent.Visible then local star=Instance.new("TextLabel");star.BackgroundTransparency=1;star.Text="★";star.TextColor3=Color3.fromRGB(255,0,0);star.TextSize=math.random(12,18);star.Position=UDim2.new(math.random(),0, -0.1,0);star.Parent=starContainer;local speed=math.random(2,4);task.spawn(function() local conn;conn=RunService.RenderStepped:Connect(function(dt) if ( not star or  not star.Parent) then conn:Disconnect();return;end star.Position=star.Position + UDim2.new(0,0,dt * speed * 0.4 ,0) ;if (star.Position.Y.Scale>1.1) then star:Destroy();conn:Disconnect();end end);end);end end end);end local LoadingFrame=Instance.new("Frame");LoadingFrame.Size=UDim2.new(0,450,0,300);LoadingFrame.Position=UDim2.new(0.5, -225,0.5, -150);LoadingFrame.BackgroundColor3=Color3.fromRGB(5,5,5);LoadingFrame.Parent=Gui;Instance.new("UICorner",LoadingFrame);applyStars(LoadingFrame);local LTitle=Instance.new("TextLabel");LTitle.Size=UDim2.new(1,0,0,120);LTitle.Text="omamilch V5";LTitle.TextColor3=Color3.fromRGB(255,0,0);LTitle.Font=Enum.Font.GothamBold;LTitle.TextSize=50;LTitle.BackgroundTransparency=1;LTitle.Parent=LoadingFrame;local LoadBarBack=Instance.new("Frame");LoadBarBack.Size=UDim2.new(0.8,0,0,12);LoadBarBack.Position=UDim2.new(0.1,0,0.7,0);LoadBarBack.BackgroundColor3=Color3.fromRGB(25,25,25);LoadBarBack.Parent=LoadingFrame;Instance.new("UICorner",LoadBarBack);local LoadBarFill=Instance.new("Frame");LoadBarFill.Size=UDim2.new(0,0,1,0);LoadBarFill.BackgroundColor3=Color3.fromRGB(140,80,255);LoadBarFill.Parent=LoadBarBack;Instance.new("UICorner",LoadBarFill);local KeyFrame=Instance.new("Frame");KeyFrame.Size=UDim2.new(0,500,0,300);KeyFrame.Position=UDim2.new(0.5, -250,0.5, -150);KeyFrame.BackgroundColor3=Color3.fromRGB(5,5,5);KeyFrame.Visible=false;KeyFrame.Parent=Gui;Instance.new("UICorner",KeyFrame);applyStars(KeyFrame);local KeyInput=Instance.new("TextBox");KeyInput.Size=UDim2.new(0.8,0,0,55);KeyInput.Position=UDim2.new(0.1,0,0.4,0);KeyInput.PlaceholderText="Key: omamilch V5";KeyInput.Text="";KeyInput.TextSize=22;KeyInput.BackgroundColor3=Color3.fromRGB(20,20,20);KeyInput.TextColor3=Color3.new(1,1,1);KeyInput.Parent=KeyFrame;Instance.new("UICorner",KeyInput);local LoginBtn=Instance.new("TextButton");LoginBtn.Size=UDim2.new(0.5,0,0,50);LoginBtn.Position=UDim2.new(0.25,0,0.75,0);LoginBtn.BackgroundColor3=Color3.fromRGB(140,80,255);LoginBtn.Text="LOGIN";LoginBtn.TextSize=20;LoginBtn.TextColor3=Color3.new(1,1,1);LoginBtn.Parent=KeyFrame;Instance.new("UICorner",LoginBtn);local MainFrame=Instance.new("Frame");MainFrame.Size=UDim2.new(0,750,0,550);MainFrame.Position=UDim2.new(0.5, -375,0.5, -275);MainFrame.BackgroundColor3=Color3.fromRGB(10,10,10);MainFrame.Visible=false;MainFrame.Parent=Gui;Instance.new("UICorner",MainFrame);local SideAccent=Instance.new("Frame");SideAccent.Size=UDim2.new(0,8,1,0);SideAccent.BackgroundColor3=Color3.fromRGB(140,80,255);SideAccent.Parent=MainFrame;Instance.new("UICorner",SideAccent);local Title=Instance.new("TextLabel");Title.Text="  omamilch V5 - Emergency Hamburg";Title.Size=UDim2.new(1,0,0,60);Title.TextColor3=Color3.fromRGB(255,0,0);Title.TextXAlignment=Enum.TextXAlignment.Left;Title.BackgroundTransparency=1;Title.Font=Enum.Font.GothamBold;Title.TextSize=25;Title.Parent=MainFrame;local TabHolder=Instance.new("Frame");TabHolder.Size=UDim2.new(1, -40,0,100);TabHolder.Position=UDim2.new(0,30,0,80);TabHolder.BackgroundTransparency=1;TabHolder.Parent=MainFrame;local TabGrid=Instance.new("UIGridLayout");TabGrid.CellSize=UDim2.new(0,160,0,40);TabGrid.CellPadding=UDim2.new(0,10,0,10);TabGrid.Parent=TabHolder;local Pages={};local CurrentPage=nil;local function createTab(name) local btn=Instance.new("TextButton");btn.BackgroundColor3=Color3.fromRGB(30,30,30);btn.Text=name;btn.TextSize=16;btn.TextColor3=Color3.new(1,1,1);btn.Parent=TabHolder;Instance.new("UICorner",btn);local page=Instance.new("ScrollingFrame");page.Size=UDim2.new(1, -60,1, -220);page.Position=UDim2.new(0,40,0,200);page.BackgroundTransparency=1;page.Visible=false;page.CanvasSize=UDim2.new(0,0,2,0);page.Parent=MainFrame;local pg=Instance.new("UIGridLayout",page);pg.CellSize=UDim2.new(0.48,0,0,60);pg.CellPadding=UDim2.new(0.02,0,0,15);Pages[name]=page;btn.MouseButton1Click:Connect(function() if CurrentPage then CurrentPage.Visible=false;end page.Visible=true;CurrentPage=page;for _,v in pairs(TabHolder:GetChildren()) do if v:IsA("TextButton") then v.BackgroundColor3=Color3.fromRGB(30,30,30);end end btn.BackgroundColor3=Color3.fromRGB(140,80,255);end);return page;end local function addFeature(page,name,callback) local f=Instance.new("Frame");f.BackgroundColor3=Color3.fromRGB(25,25,25);f.Parent=page;Instance.new("UICorner",f);local b=Instance.new("TextButton");b.Size=UDim2.new(1,0,1,0);b.BackgroundTransparency=1;b.Text="  "   .. name ;b.TextSize=18;b.TextXAlignment=Enum.TextXAlignment.Left;b.TextColor3=Color3.new(1,1,1);b.Parent=f;local active=false;b.MouseButton1Click:Connect(function() active= not active;f.BackgroundColor3=(active and Color3.fromRGB(140,80,255)) or Color3.fromRGB(25,25,25) ;callback(active);end);end local pAimbot=createTab("Aimbot");local pVisuals=createTab("Visuals");local pVehicle=createTab("Vehicle");local pMisc=createTab("Misc");local pTele=createTab("Teleports");local pAuto=createTab("AutoFarm");addFeature(pAimbot,"Silent Aim",function() end);addFeature(pAimbot,"FOV Circle",function() end);addFeature(pVisuals,"ESP Names",function() end);addFeature(pVisuals,"ESP Boxes",function() end);addFeature(pVehicle,"Car Fly",function() end);addFeature(pVehicle,"Speed Hack",function() end);addFeature(pMisc,"Infinite Ammo",function() end);addFeature(pMisc,"No Recoil",function() end);addFeature(pTele,"Police Dept",function() end);addFeature(pTele,"Hospital",function() end);applyStars(MainFrame);task.spawn(function() LoadBarFill:TweenSize(UDim2.new(1,0,1,0),"Out","Linear",3);task.wait(3.2);LoadingFrame.Visible=false;KeyFrame.Visible=true;end);LoginBtn.MouseButton1Click:Connect(function() if (KeyInput.Text=="omamilch V5") then KeyFrame.Visible=false;MainFrame.Visible=true;CurrentPage=Pages['Aimbot'];CurrentPage.Visible=true;else KeyInput.Text="WRONG KEY";task.wait(1);KeyInput.Text="";end end);UserInputService.InputBegan:Connect(function(i,p) if ( not p and (i.KeyCode==Enum.KeyCode.F3)) then if MainFrame.Parent then MainFrame.Visible= not MainFrame.Visible;end end end);local function drag(f) local d,i,s,p;f.InputBegan:Connect(function(input) if ((input.UserInputType==Enum.UserInputType.MouseButton1) or (input.UserInputType==Enum.UserInputType.Touch)) then d=true;s=input.Position;p=f.Position;end end);UserInputService.InputChanged:Connect(function(input) if (d and ((input.UserInputType==Enum.UserInputType.MouseMovement) or (input.UserInputType==Enum.UserInputType.Touch))) then local del=input.Position-s ;f.Position=UDim2.new(p.X.Scale,p.X.Offset + del.X ,p.Y.Scale,p.Y.Offset + del.Y );end end);UserInputService.InputEnded:Connect(function() d=false;end);end drag(MainFrame);drag(KeyFrame);drag(LoadingFrame); end
+local tpTitle = Instance.new("TextLabel", tpFrame)
+tpTitle.Size = UDim2.new(0.8, 0, 0, 30)
+tpTitle.Text = "Player List"
+tpTitle.TextColor3 = Color3.new(1,1,1)
+tpTitle.BackgroundColor3 = theme.border
+tpTitle.BackgroundTransparency = 0.5
+
+local tpClose = Instance.new("TextButton", tpFrame)
+tpClose.Size = UDim2.new(0, 30, 0, 30)
+tpClose.Position = UDim2.new(1, -30, 0, 0)
+tpClose.Text = "X"
+tpClose.TextColor3 = Color3.new(1,1,1)
+tpClose.BackgroundColor3 = Color3.new(0.7, 0, 0)
+tpClose.MouseButton1Click:Connect(function() tpFrame.Visible = false end)
+
+local tpList = Instance.new("ScrollingFrame", tpFrame)
+tpList.Size = UDim2.new(1, 0, 0.85, 0)
+tpList.Position = UDim2.new(0, 0, 0.15, 0)
+tpList.BackgroundTransparency = 1
+Instance.new("UIListLayout", tpList).Padding = UDim.new(0, 5)
+
+
+-- PC F3 TOGGLE
+if not isMobile then
+    userInput.InputBegan:Connect(function(input, gpe)
+        if not gpe and input.KeyCode == Enum.KeyCode.F3 then
+            mainFrame.Visible = not mainFrame.Visible
+            if not mainFrame.Visible then tpFrame.Visible = false end -- Schließt PlayerList mit
+        end
+    end)
+    print("PC-Modus: Drücke F3 zum Ein-/Ausblenden der GUI.")
+else
+    print("Mobile-Modus: GUI immer sichtbar, nutze Buttons zum Steuern.")
+end
+
+-- GLOBALE FUNKTIONEN
+local flying = false
+local noclip = false
+local currentFlyVel
+local currentFlyGyro
+
+local function toggleFly()
+    if isMobile then
+        warn("Fly ist im Mobile-Modus nicht optimiert. PC empfohlen.")
+        return
+    end
+
+    flying = not flying
+    local char = player.Character or player.CharacterAdded:Wait()
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    if currentFlyVel then currentFlyVel:Destroy() end
+    if currentFlyGyro then currentFlyGyro:Destroy() end
+
+    if flying then
+        currentFlyVel = Instance.new("BodyVelocity", root)
+        currentFlyVel.Name = "FlyVel"
+        currentFlyVel.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+
+        currentFlyGyro = Instance.new("BodyGyro", root)
+        currentFlyGyro.Name = "FlyGyro"
+        currentFlyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        currentFlyGyro.P = 9e3 -- Stärkeres P für bessere Kontrolle
+
+        task.spawn(function()
+            while flying and root.Parent == char do -- Überprüfen, ob Charakter noch existiert
+                currentFlyGyro.CFrame = workspace.CurrentCamera.CFrame
+                currentFlyVel.Velocity = workspace.CurrentCamera.CFrame.LookVector * flySpeed
+                task.wait()
+            end
+            if currentFlyVel then currentFlyVel:Destroy() end
+            if currentFlyGyro then currentFlyGyro:Destroy() end
+        end)
+    end
+end
+
+local function createFeatureButton(text, func)
+    local btn = Instance.new("TextButton", container)
+    btn.Size = UDim2.new(0.95, 0, 0, 35)
+    btn.Text = text
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.BackgroundTransparency = 0.2
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.BorderSizePixel = 1
+    btn.BorderColor3 = theme.border
+    btn.MouseButton1Click:Connect(func)
+    return btn
+end
+
+-- FEATURE BUTTONS
+createFeatureButton("Fly Toggle", toggleFly)
+createFeatureButton("NoClip Toggle", function() noclip = not noclip end)
+createFeatureButton("Speed 100", function() player.Character.Humanoid.WalkSpeed = 100 end)
+createFeatureButton("Speed 16 (Default)", function() player.Character.Humanoid.WalkSpeed = 16 end)
+createFeatureButton("Voice Unban/Join", function() 
+    pcall(function() voiceService:joinVoice() end) 
+    print("Voice Join-Befehl gesendet.")
+end)
+createFeatureButton("Teleport Players", function() tpFrame.Visible = not tpFrame.Visible end)
+
+-- EMOTES
+createFeatureButton("Emote: Bang", function()
+    local anim = Instance.new("Animation") anim.AnimationId = "rbxassetid://148840339"
+    local track = player.Character.Humanoid:LoadAnimation(anim)
+    track:Play() track:AdjustSpeed(3)
+end)
+createFeatureButton("Emote: Suck", function()
+    local anim = Instance.new("Animation") anim.AnimationId = "rbxassetid://204328711"
+    local track = player.Character.Humanoid:LoadAnimation(anim)
+    track:Play()
+end)
+
+-- PLAYER LIST LOGIK
+local function updatePlayers()
+    for _, v in pairs(tpList:GetChildren()) do if v:IsA("Frame") then v:Destroy() end end
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p ~= player then
+            local r = Instance.new("Frame", tpList)
+            r.Size = UDim2.new(1, 0, 0, 40)
+            r.BackgroundTransparency = 1
+            
+            local n = Instance.new("TextLabel", r)
+            n.Size = UDim2.new(0.5, 0, 1, 0)
+            n.Text = p.DisplayName
+            n.TextColor3 = Color3.new(1,1,1)
+            n.TextScaled = true
+            n.BackgroundTransparency = 1
+            
+            local tp = Instance.new("TextButton", r)
+            tp.Size = UDim2.new(0.25, 0, 0.8, 0)
+            tp.Position = UDim2.new(0.5, 0, 0.1, 0)
+            tp.Text = "TP"
+            tp.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+            tp.MouseButton1Click:Connect(function() 
+                if player.Character and p.Character then
+                    player.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame
+                end
+            end)
+            
+            local br = Instance.new("TextButton", r)
+            br.Size = UDim2.new(0.25, 0, 0.8, 0)
+            br.Position = UDim2.new(0.75, 0, 0.1, 0)
+            br.Text = "BR"
+            br.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+            br.MouseButton1Click:Connect(function() 
+                if player.Character and p.Character then
+                    p.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
+                end
+            end)
+        end
+    end
+end
+
+-- Auto-Refresh Player List wenn sichtbar
+task.spawn(function()
+    while task.wait(3) do
+        if tpFrame.Visible then updatePlayers() end
+    end
+end)
+
+-- NoClip Loop
+runService.Stepped:Connect(function()
+    if noclip and player.Character then
+        for _, v in pairs(player.Character:GetDescendants()) do
+            if v:IsA("BasePart") then v.CanCollide = false end
+        end
+    end
+end)
+
+print("omamilch V5 Cross-Platform Animated Edition geladen. Für HanfmomentV1.")
