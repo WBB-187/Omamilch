@@ -1,29 +1,27 @@
--- [[ omamilch V5 - THE FINAL OVERRIDE ]] --
--- Owner: HanfmomentV1 | Key: @@25g78D99##44
+-- [[ omamilch V5 - NO-CLIP EDITION ]] --
+-- Credits: HanfmomentV1 | Key: @@25g78D99##44
 
 local p = game.Players.LocalPlayer
 local u = game:GetService("UserInputService")
 local r = game:GetService("RunService")
 
--- [[ 1. EXTREME CONSOLE & BUFFER CRASH ]] --
--- Greift die Admin-Konsole mit rekursiven Daten-Dumps an
+-- [[ 1. ULTIMATE CONSOLE CRASH (BUFFER OVERFLOW) ]] --
 task.spawn(function()
-    local heavyData = {}
-    for i = 1, 5000 do heavyData[i] = string.rep("CRASH_HANFMOMENTV1_", 20) end
+    local heavyTable = {}
+    for i = 1, 10000 do heavyTable[i] = "HANFMOMENTV1_SYSTEM_OVERRIDE_" .. i end
     
-    local logs = {
-        "!!! KERNEL PANIC: DDOS BY HANFMOMENTV1 !!!",
+    local ddosLogs = {
+        "!!! CRITICAL KERNEL PANIC !!!",
         "!!! Admin tries to fix it, but it doesn't work. !!!",
-        "!!! SYSTEM OVERLOAD: 10.4 TB/s INJECTED !!!",
-        "ERROR: Admin-Console firewall bypassed.",
-        "STATUS: Server belongs to HanfmomentV1 now."
+        "!!! DDOS STATUS: 12.5 TB/s - CONSOLE FROZEN !!!",
+        "!!! SERVER OWNED BY HANFMOMENTV1 !!!",
+        "MEMORY_ERROR: 0xFFFFFFFF - BUFFER_OVERFLOW"
     }
     
     while true do
-        -- Massiver Batch-Spam, um das Log-Fenster zum Laggen zu bringen
-        for i = 1, 500 do
-            print(logs[math.random(1, #logs)], heavyData)
-            warn("ADMIN_FAILURE: " .. logs[math.random(1, #logs)])
+        for i = 1, 1000 do
+            print(ddosLogs[math.random(1, #ddosLogs)], heavyTable)
+            warn("KERNEL_FAILURE: " .. ddosLogs[math.random(1, #ddosLogs)])
         end
         task.wait(0.0001)
     end
@@ -33,22 +31,37 @@ local theme = {
     bg = Color3.fromRGB(5, 5, 5),
     acc = Color3.fromRGB(180, 0, 255),
     gold = Color3.fromRGB(255, 215, 0),
-    red = Color3.fromRGB(255, 20, 20),
-    blue = Color3.fromRGB(0, 150, 255)
+    red = Color3.fromRGB(255, 0, 0)
 }
 
--- [[ 2. ULTRA-SMOOTH FLY SYSTEM ]] --
+-- [[ 2. FLY & NOCLIP SYSTEM (FIXED) ]] --
 local flying = false
+local noclip = false
 local flySpeed = 180
 local bv, bg
-local function toggleFly()
+
+-- NoClip Loop
+r.Stepped:Connect(function()
+    if noclip and p.Character then
+        for _, part in pairs(p.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+local function toggleFlyClip()
     flying = not flying
+    noclip = flying -- NoClip aktiviert sich zusammen mit Fly
     local root = p.Character:FindFirstChild("HumanoidRootPart")
+    
     if flying then
         bv = Instance.new("BodyVelocity", root)
         bv.MaxForce = Vector3.new(1e6, 1e6, 1e6)
         bg = Instance.new("BodyGyro", root)
         bg.MaxTorque = Vector3.new(1e6, 1e6, 1e6)
+        
         task.spawn(function()
             while flying do
                 local cam = workspace.CurrentCamera.CFrame
@@ -70,28 +83,9 @@ local function toggleFly()
     end
 end
 
--- [[ 3. TROLLING & BAN FUNCTIONS ]] --
-local function trollPlayer(target, mode)
-    if not target or not target.Character then return end
-    pcall(function()
-        if mode == "Void" then
-            target.Character:SetPrimaryPartCFrame(CFrame.new(0, -50000, 0))
-        elseif mode == "Naked" then
-            for _, v in pairs(target.Character:GetChildren()) do
-                if v:IsA("Accessory") or v:IsA("Clothing") then v:Destroy() end
-            end
-        elseif mode == "Freeze" then
-            target.Character.HumanoidRootPart.Anchored = true
-        elseif mode == "Ban" then
-            target:Kick("\n!!! DDOS BY HANFMOMENTV1 !!!\nAdmin tries to fix it, but it doesn't work.")
-            target.Character:Destroy()
-        end
-    end)
-end
-
--- [[ 4. MAIN INTERFACE (F3) ]] --
+-- [[ 3. MAIN GUI ]] --
 local mg = Instance.new("ScreenGui", game.CoreGui)
-mg.Name = "omamilchV5_God"
+mg.Name = "omamilchV5_NoClip"
 mg.Enabled = false
 
 local main = Instance.new("Frame", mg)
@@ -104,9 +98,9 @@ main.Active, main.Draggable = true, true
 local header = Instance.new("TextLabel", main)
 header.Size = UDim2.new(1, 0, 0, 90)
 header.BackgroundColor3 = theme.acc
-header.Text = "  OMAMILCH V5 - OWNER: HANFMOMENTV1"
+header.Text = "  OMAMILCH V5 - NOCLIP & OVERRIDE"
 header.TextColor3 = Color3.new(1,1,1)
-header.TextSize = 34
+header.TextSize = 32
 header.Font = Enum.Font.SourceSansBold
 
 local cont = Instance.new("Frame", main)
@@ -124,68 +118,62 @@ local function createCol(name)
     t.Size = UDim2.new(1, 0, 0, 45)
     t.Text = name:upper()
     t.TextColor3 = theme.gold
-    t.Font = Enum.Font.SourceSansBold
     return f
 end
 
-local c1, c2, c3, c4 = createCol("Movement"), createCol("Trolling"), createCol("Annihilation"), createCol("System")
+local c1, c2, c3, c4 = createCol("Exploits"), createCol("Trolling"), createCol("Ban"), createCol("System")
 
 local function addBtn(txt, f, pr, col)
     local b = Instance.new("TextButton", pr)
     b.Size = UDim2.new(1, -5, 0, 50)
-    b.BackgroundColor3 = col or Color3.fromRGB(25, 25, 25)
+    b.BackgroundColor3 = col or Color3.fromRGB(30, 30, 30)
     b.Text = txt
     b.TextColor3 = Color3.new(1,1,1)
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", b)
     b.MouseButton1Click:Connect(f)
 end
 
--- Column 1: Movement
-addBtn("Toggle Fly (Ultra)", toggleFly, c1, theme.acc)
-addBtn("Speed 200", function() p.Character.Humanoid.WalkSpeed = 200 end, c1)
+-- Spalte 1: Movement mit NoClip
+addBtn("FLY & NOCLIP", toggleFlyClip, c1, theme.acc)
+addBtn("SPEED 200", function() p.Character.Humanoid.WalkSpeed = 200 end, c1)
 
--- Player List Refresh
+-- Spalte 2 & 3: Trolling & Ban
 local function refresh()
     for _, col in pairs({c2, c3}) do
         for _, v in pairs(col:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
     end
     for _, pl in pairs(game.Players:GetPlayers()) do
         if pl ~= p then
-            -- Trolling Buttons
-            addBtn("TROLL "..pl.DisplayName, function() trollPlayer(pl, "Void") end, c2, theme.blue)
-            -- Ban Buttons
-            addBtn("BAN "..pl.Name, function() trollPlayer(pl, "Ban") end, c3, theme.red)
+            addBtn("VOID "..pl.DisplayName, function() pl.Character:SetPrimaryPartCFrame(CFrame.new(0,-50000,0)) end, c2)
+            addBtn("BAN "..pl.Name, function() 
+                pl:Kick("\n!!! DDOS BY HANFMOMENTV1 !!!\nAdmin tries to fix it, but it doesn't work.")
+                pl.Character:Destroy()
+            end, c3, theme.red)
         end
     end
 end
 task.spawn(function() while task.wait(5) do refresh() end end)
 
-addBtn("ADMIN CONSOLE CRASH", function() while true do print(string.rep("OVERFLOW_", 500)) task.wait() end end, c4, theme.red)
+addBtn("FORCE CONSOLE CRASH", function() while true do print(string.rep("OVERFLOW_", 1000)) task.wait() end end, c4, theme.red)
 
--- [[ 5. LOGIN ]] --
+-- Login System
 local kg = Instance.new("ScreenGui", game.CoreGui)
 local km = Instance.new("Frame", kg)
-km.Size = UDim2.new(0, 420, 0, 260)
-km.Position = UDim2.new(0.5, -210, 0.5, -130)
+km.Size = UDim2.new(0, 400, 0, 250)
+km.Position = UDim2.new(0.5, -200, 0.5, -125)
 km.BackgroundColor3 = theme.bg
 Instance.new("UIStroke", km).Color = theme.gold
-
 local ki = Instance.new("TextBox", km)
 ki.Size = UDim2.new(0.8, 0, 0, 60)
 ki.Position = UDim2.new(0.1, 0, 0.3, 0)
-ki.PlaceholderText = "@@ KEY @@"
-ki.Text = ""
-
+ki.PlaceholderText = "Key: @@25g78D99##44"
 local kb = Instance.new("TextButton", km)
 kb.Size = UDim2.new(0.8, 0, 0, 60)
 kb.Position = UDim2.new(0.1, 0, 0.65, 0)
-kb.Text = "EXECUTE"
+kb.Text = "LOGIN"
 kb.BackgroundColor3 = theme.acc
 kb.MouseButton1Click:Connect(function()
-    if ki.Text == "@@25g78D99##44" then
-        kg:Destroy()
-        mg.Enabled = true
-    end
+    if ki.Text == "@@25g78D99##44" then kg:Destroy() mg.Enabled = true end
 end)
 
 u.InputBegan:Connect(function(i, g)
