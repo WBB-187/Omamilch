@@ -1,25 +1,22 @@
--- omamilch V5: Animated Red Star & Hemp Edition
+-- omamilch V5: Real Admin Edition
 local player = game.Players.LocalPlayer
 local userInput = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 local voiceService = game:GetService("VoiceChatService")
+local TextChatService = game:GetService("TextChatService")
 
--- Plattform-Erkennung
-local isMobile = userInput.TouchEnabled and not userInput.KeyboardEnabled
-
--- GUI Design Settings
+-- GUI Design
 local theme = {
     bg = Color3.fromRGB(0, 0, 0),
-    trans = 0.3,
-    border = Color3.fromRGB(150, 0, 255), -- Lila Rand
-    stars = Color3.fromRGB(255, 0, 0), -- Rote Sterne
-    hempLeaf = Color3.fromRGB(255, 0, 0) -- Rote Hanfblätter
+    trans = 0.2,
+    border = Color3.fromRGB(150, 0, 255),
+    stars = Color3.fromRGB(255, 0, 0)
 }
 
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.Name = "omamilchV5"
 
--- Hilfsfunktion für Fenster
+-- Fenster-Erstellung
 local function createBaseFrame(name, size, pos)
     local f = Instance.new("Frame")
     f.Name = name
@@ -32,259 +29,149 @@ local function createBaseFrame(name, size, pos)
     f.Active = true
     f.Draggable = true
     
-    -- Dynamischer Hintergrund für Hanfblätter & Sterne
-    local dynamicBg = Instance.new("Frame", f)
-    dynamicBg.Size = UDim2.new(1, 0, 1, 0)
-    dynamicBg.BackgroundTransparency = 1
-    dynamicBg.ZIndex = 0
-
-    local stars = Instance.new("TextLabel", dynamicBg)
-    stars.Size = UDim2.new(1.5, 0, 1.5, 0) -- Größer für Bewegung
-    stars.Position = UDim2.new(-0.25, 0, -0.25, 0)
+    local stars = Instance.new("TextLabel", f)
+    stars.Size = UDim2.new(1, 0, 1, 0)
     stars.BackgroundTransparency = 1
-    stars.Text = "★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆"
+    stars.Text = "★ * ★ * ★ * ★ * ★\n* ★ * ★ * ★ * ★ *\n★ * ★ * ★ * ★ * ★"
     stars.TextColor3 = theme.stars
-    stars.TextWrapped = true
-    stars.TextTransparency = 0.7
-    stars.Font = Enum.Font.SourceSansBold
+    stars.TextTransparency = 0.4
     stars.TextScaled = true
-
-    -- Hanfblatt-Symbole (verwenden wir ein Unicode-Zeichen oder generische Blätter)
-    -- Da ein echtes Hanfblatt-Symbol nicht immer renderbar ist, nutzen wir ein stilisiertes Blatt
-    local hempLeaves = Instance.new("TextLabel", dynamicBg)
-    hempLeaves.Size = UDim2.new(1.5, 0, 1.5, 0) -- Größer für Bewegung
-    hempLeaves.Position = UDim2.new(-0.25, 0, -0.25, 0)
-    hempLeaves.BackgroundTransparency = 1
-    hempLeaves.Text = "🍁 🌿 🍁 🌿 🍁 🌿 🍁 🌿 🍁 🌿 🍁 🌿" -- Stilisiertes Blatt
-    hempLeaves.TextColor3 = theme.hempLeaf
-    hempLeaves.TextWrapped = true
-    hempLeaves.TextTransparency = 0.7
-    hempLeaves.Font = Enum.Font.SourceSansBold
-    hempLeaves.TextScaled = true
-    
-    -- Animation Logic
-    local offset = 0
-    task.spawn(function()
-        while f.Parent do
-            offset = (offset + 0.005) % 1 -- Bewegung nach rechts
-            stars.Position = UDim2.new(offset - 0.25, 0, -0.25, 0)
-            hempLeaves.Position = UDim2.new(-offset - 0.25, 0, -0.25, 0) -- Bewegung nach links
-            task.wait(0.05)
-        end
-    end)
-
+    stars.ZIndex = 0
     return f
 end
 
--- HAUPTFENSTER
--- Standardmäßig in der Mitte
-local mainFrame = createBaseFrame("Main", UDim2.new(0, 220, 0, 300), UDim2.new(0.5, -110, 0.5, -150))
+local mainFrame = createBaseFrame("Main", UDim2.new(0, 220, 0, 380), UDim2.new(0.5, -110, 0.5, -190))
 mainFrame.Parent = screenGui
 
 local title = Instance.new("TextLabel", mainFrame)
-title.Size = UDim2.new(0.8, 0, 0, 30)
-title.Text = "omamilch V5 - " .. (isMobile and "Mobile" or "PC")
+title.Size = UDim2.new(1, 0, 0, 35)
+title.Text = "omamilch V5 - ADMIN PANEL"
 title.TextColor3 = Color3.new(1, 1, 1)
-title.BackgroundColor3 = theme.border -- Lila Hintergrund für Titel
-title.BackgroundTransparency = 0.5
-
--- Schließen & Minimieren
-local closeBtn = Instance.new("TextButton", mainFrame)
-closeBtn.Size = UDim2.new(0, 30, 0, 30)
-closeBtn.Position = UDim2.new(1, -30, 0, 0)
-closeBtn.Text = "X"
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
-closeBtn.BackgroundColor3 = Color3.new(0.7, 0, 0)
-closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
-
-local hideBtn = Instance.new("TextButton", mainFrame)
-hideBtn.Size = UDim2.new(0, 30, 0, 30)
-hideBtn.Position = UDim2.new(1, -60, 0, 0)
-hideBtn.Text = "▼"
-hideBtn.TextColor3 = Color3.new(1, 1, 1)
-hideBtn.BackgroundTransparency = 1
+title.BackgroundColor3 = theme.border
+title.BackgroundTransparency = 0.3
 
 local container = Instance.new("ScrollingFrame", mainFrame)
-container.Size = UDim2.new(1, -10, 0.85, -10)
-container.Position = UDim2.new(0, 5, 0.12, 5)
+container.Size = UDim2.new(1, -10, 0.88, -40)
+container.Position = UDim2.new(0, 5, 0.12, 0)
 container.BackgroundTransparency = 1
-container.CanvasSize = UDim2.new(0, 0, 2, 0)
+container.CanvasSize = UDim2.new(0, 0, 3, 0)
+container.ScrollBarThickness = 2
 Instance.new("UIListLayout", container).Padding = UDim.new(0, 5)
 
-hideBtn.MouseButton1Click:Connect(function()
-    container.Visible = not container.Visible
-    mainFrame.Size = container.Visible and UDim2.new(0, 220, 0, 300) or UDim2.new(0, 220, 0, 30)
-    hideBtn.Text = container.Visible and "▼" or "▲"
-end)
+-- --- ADMIN PERMISSIONS & VISUALS ---
 
-
--- PLAYER LIST FENSTER
-local tpFrame = createBaseFrame("PlayerMenu", UDim2.new(0, 220, 0, 300), UDim2.new(0.5, -110, 0.5, -150))
-tpFrame.Parent = screenGui
-tpFrame.Visible = false
-
-local tpTitle = Instance.new("TextLabel", tpFrame)
-tpTitle.Size = UDim2.new(0.8, 0, 0, 30)
-tpTitle.Text = "Player List"
-tpTitle.TextColor3 = Color3.new(1,1,1)
-tpTitle.BackgroundColor3 = theme.border
-tpTitle.BackgroundTransparency = 0.5
-
-local tpClose = Instance.new("TextButton", tpFrame)
-tpClose.Size = UDim2.new(0, 30, 0, 30)
-tpClose.Position = UDim2.new(1, -30, 0, 0)
-tpClose.Text = "X"
-tpClose.TextColor3 = Color3.new(1,1,1)
-tpClose.BackgroundColor3 = Color3.new(0.7, 0, 0)
-tpClose.MouseButton1Click:Connect(function() tpFrame.Visible = false end)
-
-local tpList = Instance.new("ScrollingFrame", tpFrame)
-tpList.Size = UDim2.new(1, 0, 0.85, 0)
-tpList.Position = UDim2.new(0, 0, 0.15, 0)
-tpList.BackgroundTransparency = 1
-Instance.new("UIListLayout", tpList).Padding = UDim.new(0, 5)
-
-
--- PC F3 TOGGLE
-if not isMobile then
-    userInput.InputBegan:Connect(function(input, gpe)
-        if not gpe and input.KeyCode == Enum.KeyCode.F3 then
-            mainFrame.Visible = not mainFrame.Visible
-            if not mainFrame.Visible then tpFrame.Visible = false end -- Schließt PlayerList mit
+-- Realistischer Chat Tag [OWNER]
+if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+    TextChatService.OnIncomingMessage = function(message)
+        local properties = Instance.new("TextChatMessageProperties")
+        if message.TextSource and message.TextSource.UserId == player.UserId then
+            properties.PrefixText = "<font color='#FF0000'><b>[OWNER]</b></font> " .. message.PrefixText
         end
-    end)
-    print("PC-Modus: Drücke F3 zum Ein-/Ausblenden der GUI.")
-else
-    print("Mobile-Modus: GUI immer sichtbar, nutze Buttons zum Steuern.")
+        return properties
+    end
 end
 
--- GLOBALE FUNKTIONEN
+-- Overhead Admin Tag
+local function applyAdminTag()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local head = char:WaitForChild("Head")
+    if head:FindFirstChild("AdminTag") then head.AdminTag:Destroy() end
+
+    local tag = Instance.new("BillboardGui", head)
+    tag.Name = "AdminTag"
+    tag.Size = UDim2.new(0, 200, 0, 50)
+    tag.AlwaysOnTop = true
+    tag.ExtentsOffset = Vector3.new(0, 3.5, 0)
+
+    local label = Instance.new("TextLabel", tag)
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.Text = "[OWNER] " .. player.DisplayName
+    label.TextColor3 = theme.stars
+    label.TextStrokeTransparency = 0.2
+    label.BackgroundTransparency = 1
+    label.Font = Enum.Font.SpecialElite
+    label.TextScaled = true
+end
+
+-- --- ADMIN TOOLS ---
+
 local flying = false
 local noclip = false
-local currentFlyVel
-local currentFlyGyro
+local flySpeed = 90
 
 local function toggleFly()
-    if isMobile then
-        warn("Fly ist im Mobile-Modus nicht optimiert. PC empfohlen.")
-        return
-    end
-
     flying = not flying
     local char = player.Character or player.CharacterAdded:Wait()
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-
-    if currentFlyVel then currentFlyVel:Destroy() end
-    if currentFlyGyro then currentFlyGyro:Destroy() end
-
+    local root = char:WaitForChild("HumanoidRootPart")
+    
     if flying then
-        currentFlyVel = Instance.new("BodyVelocity", root)
-        currentFlyVel.Name = "FlyVel"
-        currentFlyVel.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-
-        currentFlyGyro = Instance.new("BodyGyro", root)
-        currentFlyGyro.Name = "FlyGyro"
-        currentFlyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-        currentFlyGyro.P = 9e3 -- Stärkeres P für bessere Kontrolle
+        local bv = Instance.new("BodyVelocity", root)
+        bv.Name = "AdminFlyVel"
+        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        
+        local bg = Instance.new("BodyGyro", root)
+        bg.Name = "AdminFlyGyro"
+        bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        bg.P = 25000 
 
         task.spawn(function()
-            while flying and root.Parent == char do -- Überprüfen, ob Charakter noch existiert
-                currentFlyGyro.CFrame = workspace.CurrentCamera.CFrame
-                currentFlyVel.Velocity = workspace.CurrentCamera.CFrame.LookVector * flySpeed
+            while flying do
+                bg.CFrame = workspace.CurrentCamera.CFrame
+                bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * flySpeed
                 task.wait()
             end
-            if currentFlyVel then currentFlyVel:Destroy() end
-            if currentFlyGyro then currentFlyGyro:Destroy() end
+            bv:Destroy()
+            bg:Destroy()
         end)
     end
 end
 
-local function createFeatureButton(text, func)
-    local btn = Instance.new("TextButton", container)
-    btn.Size = UDim2.new(0.95, 0, 0, 35)
-    btn.Text = text
-    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    btn.BackgroundTransparency = 0.2
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.BorderSizePixel = 1
-    btn.BorderColor3 = theme.border
-    btn.MouseButton1Click:Connect(func)
-    return btn
+local function createAdminBtn(txt, func)
+    local b = Instance.new("TextButton", container)
+    b.Size = UDim2.new(0.95, 0, 0, 35)
+    b.Text = txt
+    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    b.TextColor3 = Color3.new(1, 1, 1)
+    b.BorderSizePixel = 1
+    b.BorderColor3 = theme.border
+    b.MouseButton1Click:Connect(func)
 end
 
--- FEATURE BUTTONS
-createFeatureButton("Fly Toggle", toggleFly)
-createFeatureButton("NoClip Toggle", function() noclip = not noclip end)
-createFeatureButton("Speed 100", function() player.Character.Humanoid.WalkSpeed = 100 end)
-createFeatureButton("Speed 16 (Default)", function() player.Character.Humanoid.WalkSpeed = 16 end)
-createFeatureButton("Voice Unban/Join", function() 
-    pcall(function() voiceService:joinVoice() end) 
-    print("Voice Join-Befehl gesendet.")
-end)
-createFeatureButton("Teleport Players", function() tpFrame.Visible = not tpFrame.Visible end)
+-- BUTTONS
+createAdminBtn("Fly: Enabled/Disabled", toggleFly)
+createAdminBtn("NoClip: Active/Inactive", function() noclip = not noclip end)
+createAdminBtn("Set Admin Speed (100)", function() player.Character.Humanoid.WalkSpeed = 100 end)
+createAdminBtn("Apply Visual Tags", applyAdminTag)
+createAdminBtn("Override Voice Mute", function() pcall(function() voiceService:joinVoice() end) end)
 
 -- EMOTES
-createFeatureButton("Emote: Bang", function()
-    local anim = Instance.new("Animation") anim.AnimationId = "rbxassetid://148840339"
-    local track = player.Character.Humanoid:LoadAnimation(anim)
-    track:Play() track:AdjustSpeed(3)
-end)
-createFeatureButton("Emote: Suck", function()
-    local anim = Instance.new("Animation") anim.AnimationId = "rbxassetid://204328711"
-    local track = player.Character.Humanoid:LoadAnimation(anim)
-    track:Play()
+createAdminBtn("Emote: Bang", function()
+    local a = Instance.new("Animation") a.AnimationId = "rbxassetid://148840339"
+    player.Character.Humanoid:LoadAnimation(a):Play()
 end)
 
--- PLAYER LIST LOGIK
-local function updatePlayers()
-    for _, v in pairs(tpList:GetChildren()) do if v:IsA("Frame") then v:Destroy() end end
-    for _, p in pairs(game.Players:GetPlayers()) do
-        if p ~= player then
-            local r = Instance.new("Frame", tpList)
-            r.Size = UDim2.new(1, 0, 0, 40)
-            r.BackgroundTransparency = 1
-            
-            local n = Instance.new("TextLabel", r)
-            n.Size = UDim2.new(0.5, 0, 1, 0)
-            n.Text = p.DisplayName
-            n.TextColor3 = Color3.new(1,1,1)
-            n.TextScaled = true
-            n.BackgroundTransparency = 1
-            
-            local tp = Instance.new("TextButton", r)
-            tp.Size = UDim2.new(0.25, 0, 0.8, 0)
-            tp.Position = UDim2.new(0.5, 0, 0.1, 0)
-            tp.Text = "TP"
-            tp.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
-            tp.MouseButton1Click:Connect(function() 
-                if player.Character and p.Character then
-                    player.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame
-                end
-            end)
-            
-            local br = Instance.new("TextButton", r)
-            br.Size = UDim2.new(0.25, 0, 0.8, 0)
-            br.Position = UDim2.new(0.75, 0, 0.1, 0)
-            br.Text = "BR"
-            br.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
-            br.MouseButton1Click:Connect(function() 
-                if player.Character and p.Character then
-                    p.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
-                end
-            end)
+createAdminBtn("Emote: Suck", function()
+    local a = Instance.new("Animation") a.AnimationId = "rbxassetid://204328711"
+    player.Character.Humanoid:LoadAnimation(a):Play()
+end)
+
+-- PLAYER LIST
+local tpFrame = createBaseFrame("AdminTP", UDim2.new(0, 200, 0, 250), UDim2.new(0.7, 0, 0.3, 0))
+tpFrame.Parent = screenGui
+tpFrame.Visible = false
+createAdminBtn("Target Player List", function() tpFrame.Visible = not tpFrame.Visible end)
+
+-- PC KEYBIND (F3)
+if not (userInput.TouchEnabled and not userInput.KeyboardEnabled) then
+    userInput.InputBegan:Connect(function(i, g)
+        if not g and i.KeyCode == Enum.KeyCode.F3 then 
+            mainFrame.Visible = not mainFrame.Visible 
+            tpFrame.Visible = false
         end
-    end
+    end)
 end
 
--- Auto-Refresh Player List wenn sichtbar
-task.spawn(function()
-    while task.wait(3) do
-        if tpFrame.Visible then updatePlayers() end
-    end
-end)
-
--- NoClip Loop
+-- NOCLIP
 runService.Stepped:Connect(function()
     if noclip and player.Character then
         for _, v in pairs(player.Character:GetDescendants()) do
@@ -293,4 +180,4 @@ runService.Stepped:Connect(function()
     end
 end)
 
-print("omamilch V5 Cross-Platform Animated Edition geladen. Für HanfmomentV1.")
+print("omamilch V5: Admin Access Granted for HanfmomentV1")
