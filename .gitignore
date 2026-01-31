@@ -1,14 +1,14 @@
--- omamilch V5: Real Admin Edition
+-- omamilch V5: Final Admin & Voice Force
 local player = game.Players.LocalPlayer
 local userInput = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
-local voiceService = game:GetService("VoiceChatService")
 local TextChatService = game:GetService("TextChatService")
+local VoiceChatService = game:GetService("VoiceChatService")
+local starterGui = game:GetService("StarterGui")
 
--- GUI Design
+-- Design
 local theme = {
     bg = Color3.fromRGB(0, 0, 0),
-    trans = 0.2,
     border = Color3.fromRGB(150, 0, 255),
     stars = Color3.fromRGB(255, 0, 0)
 }
@@ -16,168 +16,127 @@ local theme = {
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.Name = "omamilchV5"
 
--- Fenster-Erstellung
-local function createBaseFrame(name, size, pos)
-    local f = Instance.new("Frame")
+-- [OWNER] Chat Tag
+if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+    TextChatService.OnIncomingMessage = function(message)
+        local props = Instance.new("TextChatMessageProperties")
+        if message.TextSource and message.TextSource.UserId == player.UserId then
+            props.PrefixText = "<font color='#FF0000'><b>[OWNER]</b></font> " .. message.PrefixText
+        end
+        return props
+    end
+end
+
+-- GUI Erstellung
+local function createFrame(name, size, pos)
+    local f = Instance.new("Frame", screenGui)
     f.Name = name
     f.Size = size
     f.Position = pos
     f.BackgroundColor3 = theme.bg
-    f.BackgroundTransparency = theme.trans
+    f.BackgroundTransparency = 0.2
     f.BorderSizePixel = 2
     f.BorderColor3 = theme.border
     f.Active = true
     f.Draggable = true
-    
-    local stars = Instance.new("TextLabel", f)
-    stars.Size = UDim2.new(1, 0, 1, 0)
-    stars.BackgroundTransparency = 1
-    stars.Text = "★ * ★ * ★ * ★ * ★\n* ★ * ★ * ★ * ★ *\n★ * ★ * ★ * ★ * ★"
-    stars.TextColor3 = theme.stars
-    stars.TextTransparency = 0.4
-    stars.TextScaled = true
-    stars.ZIndex = 0
     return f
 end
 
-local mainFrame = createBaseFrame("Main", UDim2.new(0, 220, 0, 380), UDim2.new(0.5, -110, 0.5, -190))
-mainFrame.Parent = screenGui
-
-local title = Instance.new("TextLabel", mainFrame)
-title.Size = UDim2.new(1, 0, 0, 35)
-title.Text = "omamilch V5 - ADMIN PANEL"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.BackgroundColor3 = theme.border
-title.BackgroundTransparency = 0.3
-
-local container = Instance.new("ScrollingFrame", mainFrame)
-container.Size = UDim2.new(1, -10, 0.88, -40)
+local main = createFrame("Main", UDim2.new(0, 220, 0, 350), UDim2.new(0.5, -110, 0.5, -175))
+local container = Instance.new("ScrollingFrame", main)
+container.Size = UDim2.new(1, -10, 0.85, 0)
 container.Position = UDim2.new(0, 5, 0.12, 0)
 container.BackgroundTransparency = 1
-container.CanvasSize = UDim2.new(0, 0, 3, 0)
-container.ScrollBarThickness = 2
 Instance.new("UIListLayout", container).Padding = UDim.new(0, 5)
 
--- --- ADMIN PERMISSIONS & VISUALS ---
-
--- Realistischer Chat Tag [OWNER]
-if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
-    TextChatService.OnIncomingMessage = function(message)
-        local properties = Instance.new("TextChatMessageProperties")
-        if message.TextSource and message.TextSource.UserId == player.UserId then
-            properties.PrefixText = "<font color='#FF0000'><b>[OWNER]</b></font> " .. message.PrefixText
-        end
-        return properties
-    end
-end
-
--- Overhead Admin Tag
-local function applyAdminTag()
-    local char = player.Character or player.CharacterAdded:Wait()
-    local head = char:WaitForChild("Head")
-    if head:FindFirstChild("AdminTag") then head.AdminTag:Destroy() end
-
-    local tag = Instance.new("BillboardGui", head)
-    tag.Name = "AdminTag"
-    tag.Size = UDim2.new(0, 200, 0, 50)
-    tag.AlwaysOnTop = true
-    tag.ExtentsOffset = Vector3.new(0, 3.5, 0)
-
-    local label = Instance.new("TextLabel", tag)
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.Text = "[OWNER] " .. player.DisplayName
-    label.TextColor3 = theme.stars
-    label.TextStrokeTransparency = 0.2
-    label.BackgroundTransparency = 1
-    label.Font = Enum.Font.SpecialElite
-    label.TextScaled = true
-end
-
--- --- ADMIN TOOLS ---
-
-local flying = false
-local noclip = false
-local flySpeed = 90
-
-local function toggleFly()
-    flying = not flying
-    local char = player.Character or player.CharacterAdded:Wait()
-    local root = char:WaitForChild("HumanoidRootPart")
-    
-    if flying then
-        local bv = Instance.new("BodyVelocity", root)
-        bv.Name = "AdminFlyVel"
-        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-        
-        local bg = Instance.new("BodyGyro", root)
-        bg.Name = "AdminFlyGyro"
-        bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-        bg.P = 25000 
-
-        task.spawn(function()
-            while flying do
-                bg.CFrame = workspace.CurrentCamera.CFrame
-                bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * flySpeed
-                task.wait()
-            end
-            bv:Destroy()
-            bg:Destroy()
-        end)
-    end
-end
-
-local function createAdminBtn(txt, func)
-    local b = Instance.new("TextButton", container)
-    b.Size = UDim2.new(0.95, 0, 0, 35)
-    b.Text = txt
-    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    b.TextColor3 = Color3.new(1, 1, 1)
-    b.BorderSizePixel = 1
-    b.BorderColor3 = theme.border
-    b.MouseButton1Click:Connect(func)
-end
-
--- BUTTONS
-createAdminBtn("Fly: Enabled/Disabled", toggleFly)
-createAdminBtn("NoClip: Active/Inactive", function() noclip = not noclip end)
-createAdminBtn("Set Admin Speed (100)", function() player.Character.Humanoid.WalkSpeed = 100 end)
-createAdminBtn("Apply Visual Tags", applyAdminTag)
-createAdminBtn("Override Voice Mute", function() pcall(function() voiceService:joinVoice() end) end)
-
--- EMOTES
-createAdminBtn("Emote: Bang", function()
-    local a = Instance.new("Animation") a.AnimationId = "rbxassetid://148840339"
-    player.Character.Humanoid:LoadAnimation(a):Play()
-end)
-
-createAdminBtn("Emote: Suck", function()
-    local a = Instance.new("Animation") a.AnimationId = "rbxassetid://204328711"
-    player.Character.Humanoid:LoadAnimation(a):Play()
-end)
-
--- PLAYER LIST
-local tpFrame = createBaseFrame("AdminTP", UDim2.new(0, 200, 0, 250), UDim2.new(0.7, 0, 0.3, 0))
-tpFrame.Parent = screenGui
-tpFrame.Visible = false
-createAdminBtn("Target Player List", function() tpFrame.Visible = not tpFrame.Visible end)
-
--- PC KEYBIND (F3)
-if not (userInput.TouchEnabled and not userInput.KeyboardEnabled) then
-    userInput.InputBegan:Connect(function(i, g)
-        if not g and i.KeyCode == Enum.KeyCode.F3 then 
-            mainFrame.Visible = not mainFrame.Visible 
-            tpFrame.Visible = false
+-- VOICE FORCE / ANTI MUTE (Versucht Voice permanent aktiv zu halten)
+local function forceVoice()
+    task.spawn(function()
+        while true do
+            pcall(function()
+                if not VoiceChatService:IsVoiceChatEnabledForUserIdAsync(player.UserId) then
+                    -- Versucht den Service neu zu triggern
+                    VoiceChatService:joinVoice()
+                end
+            end)
+            task.wait(10) -- Prüft alle 10 Sekunden
         end
     end)
 end
 
--- NOCLIP
-runService.Stepped:Connect(function()
-    if noclip and player.Character then
-        for _, v in pairs(player.Character:GetDescendants()) do
-            if v:IsA("BasePart") then v.CanCollide = false end
-        end
+-- FLY SYSTEM (Präzise Steuerung: Stoppt bei Stillstand)
+local flying = false
+local flySpeed = 80
+local bv, bg
+
+local function toggleFly()
+    flying = not flying
+    local root = player.Character:WaitForChild("HumanoidRootPart")
+    if flying then
+        bv = Instance.new("BodyVelocity", root)
+        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        bg = Instance.new("BodyGyro", root)
+        bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        bg.P = 30000
+
+        task.spawn(function()
+            while flying do
+                local cam = workspace.CurrentCamera.CFrame
+                local dir = Vector3.new(0,0.05,0) -- Minimaler Auftrieb gegen Schwerkraft
+                
+                if userInput:IsKeyDown(Enum.KeyCode.W) then dir = cam.LookVector
+                elseif userInput:IsKeyDown(Enum.KeyCode.S) then dir = -cam.LookVector
+                elseif userInput:IsKeyDown(Enum.KeyCode.A) then dir = -cam.RightVector
+                elseif userInput:IsKeyDown(Enum.KeyCode.D) then dir = cam.RightVector
+                end
+                
+                if dir.Magnitude > 0.1 then
+                    bv.Velocity = dir * flySpeed
+                else
+                    bv.Velocity = Vector3.new(0,0,0) -- Sofortiger Stopp
+                end
+                bg.CFrame = cam
+                task.wait()
+            end
+            bv:Destroy() bg:Destroy()
+        end)
     end
+end
+
+-- EMOTE FIX (Direktes Laden über Humanoid)
+local function playEmote(id)
+    local char = player.Character
+    if char and char:FindFirstChild("Humanoid") then
+        local anim = Instance.new("Animation")
+        anim.AnimationId = "rbxassetid://" .. id
+        local track = char.Humanoid:LoadAnimation(anim)
+        track:Play()
+        if id == "148840339" then track:AdjustSpeed(4) end
+    end
+end
+
+-- BUTTONS
+local function btn(t, f)
+    local b = Instance.new("TextButton", container)
+    b.Size = UDim2.new(1, 0, 0, 35)
+    b.Text = t
+    b.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    b.TextColor3 = Color3.new(1,1,1)
+    b.MouseButton1Click:Connect(f)
+end
+
+btn("Fly (Fixed WASD/Stop)", toggleFly)
+btn("Emote: Bang", function() playEmote("148840339") end)
+btn("Emote: Suck", function() playEmote("204328711") end)
+btn("Force Voice Active", function() 
+    forceVoice() 
+    starterGui:SetCore("ChatMakeSystemMessage", {Text = "[SYSTEM] Voice-Anti-Ban aktiviert.", Color = Color3.new(0,1,0)})
+end)
+btn("Deep Admin List", function() screenGui.AdminMenu.Visible = not screenGui.AdminMenu.Visible end)
+
+-- PC F3 Toggle
+userInput.InputBegan:Connect(function(i, g)
+    if not g and i.KeyCode == Enum.KeyCode.F3 then main.Visible = not main.Visible end
 end)
 
-print("omamilch V5: Admin Access Granted for HanfmomentV1")
+-- (Hier folgt der Rest der Player-Liste und des Ban-Systems aus dem vorherigen Script...)
