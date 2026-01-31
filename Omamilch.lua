@@ -1,111 +1,144 @@
--- [[ omamilch V5 - TRIXO STYLE ]] --
--- OWNER: HanfmomentV1
--- KEY: HanfmomentV1
+-- [[ omamilch V5 - ULTIMATE GOLD ]] --
+-- Key: HanfmomentV1
+-- Owner: HanfmomentV1
 
 local player = game.Players.LocalPlayer
 local userInput = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 local TextChatService = game:GetService("TextChatService")
-local starterGui = game:GetService("StarterGui")
 local teleportService = game:GetService("TeleportService")
+local starterGui = game:GetService("StarterGui")
 
--- Farbschema
+-- Design-Konfiguration
 local theme = {
-    main = Color3.fromRGB(15, 15, 15),
+    bg = Color3.fromRGB(15, 15, 15),
     accent = Color3.fromRGB(150, 0, 255),
+    gold = Color3.fromRGB(255, 215, 0),
     danger = Color3.fromRGB(255, 0, 0),
-    text = Color3.fromRGB(255, 255, 255)
+    success = Color3.fromRGB(0, 255, 100)
 }
 
--- Vorherige Instanzen säubern
+-- Reinigung alter Instanzen
 for _, v in pairs(game.CoreGui:GetChildren()) do
-    if v.Name == "omamilch_V5_Final" then v:Destroy() end
+    if v.Name == "omamilch_V5_Ultimate" or v.Name == "omamilch_Key" then v:Destroy() end
 end
 
-local screenGui = Instance.new("ScreenGui", game.CoreGui)
-screenGui.Name = "omamilch_V5_Final"
-screenGui.ResetOnSpawn = false
-
--- [[ FIX: CHAT TAG SAFETY ]] --
-local function setupChat()
-    pcall(function()
-        if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
-            TextChatService.OnIncomingMessage = function(message)
-                local props = Instance.new("TextChatMessageProperties")
-                if message.TextSource and message.TextSource.UserId == player.UserId then
-                    props.PrefixText = "<font color='#FF0000'><b>[OWNER]</b></font> " .. message.PrefixText
-                end
-                return props
-            end
-        end
+-- [[ GLOBAL NOTIFY SYSTEM ]] --
+local function sendNotify(msg, color)
+    local screen = game.CoreGui:FindFirstChild("omamilch_V5_Ultimate") or game.CoreGui:FindFirstChild("omamilch_Key")
+    local frame = Instance.new("Frame", screen)
+    frame.Size = UDim2.new(0, 400, 0, 50)
+    frame.Position = UDim2.new(0.5, -200, 0, -60)
+    frame.BackgroundColor3 = theme.bg
+    frame.BorderColor3 = color or theme.gold
+    frame.BorderSizePixel = 2
+    
+    local txt = Instance.new("TextLabel", frame)
+    txt.Size = UDim2.new(1, 0, 1, 0)
+    txt.Text = "★ " .. msg .. " ★"
+    txt.TextColor3 = Color3.new(1,1,1)
+    txt.Font = Enum.Font.GothamBold
+    txt.TextSize = 18
+    txt.BackgroundTransparency = 1
+    
+    frame:TweenPosition(UDim2.new(0.5, -200, 0.1, 0), "Out", "Back", 0.5)
+    task.delay(3, function()
+        frame:TweenPosition(UDim2.new(0.5, -200, 0, -60), "In", "Quad", 0.5)
+        task.wait(0.6)
+        frame:Destroy()
     end)
 end
-setupChat()
 
--- [[ UI GENERATOR ]] --
-local main = Instance.new("Frame", screenGui)
-main.Size = UDim2.new(0, 500, 0, 350)
-main.Position = UDim2.new(0.5, -250, 0.5, -175)
-main.BackgroundColor3 = theme.main
+-- [[ KEY SYSTEM ]] --
+local keyGui = Instance.new("ScreenGui", game.CoreGui)
+keyGui.Name = "omamilch_Key"
+
+local kMain = Instance.new("Frame", keyGui)
+kMain.Size = UDim2.new(0, 350, 0, 200)
+kMain.Position = UDim2.new(0.5, -175, 0.5, -100)
+kMain.BackgroundColor3 = theme.bg
+kMain.BorderSizePixel = 2
+kMain.BorderColor3 = theme.gold
+
+local kTitle = Instance.new("TextLabel", kMain)
+kTitle.Size = UDim2.new(1, 0, 0, 40)
+kTitle.Text = "ENTER KEY - OMAMILCH V5"
+kTitle.TextColor3 = theme.gold
+kTitle.BackgroundTransparency = 1
+
+local kBox = Instance.new("TextBox", kMain)
+kBox.Size = UDim2.new(0.8, 0, 0, 40)
+kBox.Position = UDim2.new(0.1, 0, 0.35, 0)
+kBox.PlaceholderText = "Key: HanfmomentV1"
+kBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+kBox.TextColor3 = Color3.new(1,1,1)
+
+local kBtn = Instance.new("TextButton", kMain)
+kBtn.Size = UDim2.new(0.8, 0, 0, 40)
+kBtn.Position = UDim2.new(0.1, 0, 0.7, 0)
+kBtn.Text = "ACCESS GRANTED"
+kBtn.BackgroundColor3 = theme.accent
+kBtn.TextColor3 = Color3.new(1,1,1)
+
+-- [[ MAIN GUI ]] --
+local mainGui = Instance.new("ScreenGui", game.CoreGui)
+mainGui.Name = "omamilch_V5_Ultimate"
+mainGui.Enabled = false
+
+local main = Instance.new("Frame", mainGui)
+main.Size = UDim2.new(0, 600, 0, 450)
+main.Position = UDim2.new(0.5, -300, 0.5, -225)
+main.BackgroundColor3 = theme.bg
 main.BorderSizePixel = 0
 main.Active = true
 main.Draggable = true
 
--- Glow Effekt
-local glow = Instance.new("Frame", main)
-glow.Size = UDim2.new(1, 4, 1, 4)
-glow.Position = UDim2.new(0, -2, 0, -2)
-glow.BackgroundColor3 = theme.accent
-glow.ZIndex = 0
+local sideBar = Instance.new("Frame", main)
+sideBar.Size = UDim2.new(0, 150, 1, 0)
+sideBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 
-local titleBar = Instance.new("TextLabel", main)
-titleBar.Size = UDim2.new(1, 0, 0, 40)
-titleBar.BackgroundColor3 = theme.accent
-titleBar.Text = "  omamilch V5 | PREMIER ADMIN - OWNER: " .. player.Name
-titleBar.TextColor3 = theme.text
-titleBar.TextXAlignment = Enum.TextXAlignment.Left
-titleBar.Font = Enum.Font.GothamBold
-titleBar.TextSize = 18
+local content = Instance.new("Frame", main)
+content.Size = UDim2.new(1, -160, 1, -10)
+content.Position = UDim2.new(0, 155, 0, 5)
+content.BackgroundTransparency = 1
 
--- Kategorien
-local container = Instance.new("Frame", main)
-container.Size = UDim2.new(1, -10, 1, -50)
-container.Position = UDim2.new(0, 5, 0, 45)
-container.BackgroundTransparency = 1
-
-local list = Instance.new("UIListLayout", container)
-list.FillDirection = Enum.FillDirection.Horizontal
-list.Padding = UDim.new(0, 10)
-
-local function createSection(name)
-    local s = Instance.new("ScrollingFrame", container)
-    s.Size = UDim2.new(0.31, 0, 1, 0)
-    s.BackgroundTransparency = 0.9
-    s.BackgroundColor3 = Color3.new(1,1,1)
-    s.ScrollBarThickness = 2
-    local l = Instance.new("UIListLayout", s)
-    l.Padding = UDim.new(0, 5)
-    
-    local t = Instance.new("TextLabel", s)
-    t.Size = UDim2.new(1, 0, 0, 25)
-    t.Text = name:upper()
-    t.TextColor3 = theme.accent
-    t.Font = Enum.Font.GothamBold
-    return s
+local pages = {}
+local function createPage(name)
+    local p = Instance.new("ScrollingFrame", content)
+    p.Size = UDim2.new(1, 0, 1, 0)
+    p.BackgroundTransparency = 1
+    p.Visible = false
+    p.ScrollBarThickness = 2
+    Instance.new("UIListLayout", p).Padding = UDim.new(0, 5)
+    pages[name] = p
+    return p
 end
 
-local secMain = createSection("Movement")
-local secAbuse = createSection("Abuse/Combat")
-local secPlayer = createSection("Players")
+local pMain = createPage("Main")
+local pPlayers = createPage("Players")
+local pSettings = createPage("Settings")
+pMain.Visible = true
 
--- [[ FUNKTIONEN ]] --
+-- [[ FEATURES LOGIK ]] --
 
--- Ultra Fly
-local flying = false
-local noclip = false
-local flySpeed = 100
+-- Auto Report System
+local autoReport = false
+local function reportAll()
+    if autoReport then
+        for _, p in pairs(game.Players:GetPlayers()) do
+            if p ~= player then
+                pcall(function()
+                    player:ReportAbuse(p, "Bullying", "omamilch V5 Auto-Report Detection")
+                end)
+            end
+        end
+        sendNotify("Alle Spieler automatisch gemeldet!", theme.success)
+    end
+end
+
+-- Fly & Noclip Logic
+local flying, noclip = false, false
 local bv, bg
-
 local function toggleFly()
     flying = not flying
     noclip = flying
@@ -115,29 +148,22 @@ local function toggleFly()
         bv.MaxForce = Vector3.new(1e6, 1e6, 1e6)
         bg = Instance.new("BodyGyro", root)
         bg.MaxTorque = Vector3.new(1e6, 1e6, 1e6)
-        bg.P = 20000
-        
         task.spawn(function()
             while flying do
                 local cam = workspace.CurrentCamera.CFrame
                 local dir = Vector3.new(0,0,0)
                 if userInput:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.LookVector end
                 if userInput:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.LookVector end
-                if userInput:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.RightVector end
-                if userInput:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.RightVector end
-                
-                bv.Velocity = dir * flySpeed
+                bv.Velocity = dir * 150
                 bg.CFrame = cam
                 runService.RenderStepped:Wait()
             end
+            if bv then bv:Destroy() end
+            if bg then bg:Destroy() end
         end)
-    else
-        if bv then bv:Destroy() end
-        if bg then bg:Destroy() end
     end
 end
 
--- NoClip Loop
 runService.Stepped:Connect(function()
     if noclip and player.Character then
         for _, v in pairs(player.Character:GetDescendants()) do
@@ -146,62 +172,99 @@ runService.Stepped:Connect(function()
     end
 end)
 
--- Button Generator
+-- UI Buttons Helper
 local function addBtn(txt, f, parent)
     local b = Instance.new("TextButton", parent)
-    b.Size = UDim2.new(1, -4, 0, 35)
-    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    b.Size = UDim2.new(1, -10, 0, 40)
+    b.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     b.Text = txt
-    b.TextColor3 = theme.text
+    b.TextColor3 = Color3.new(1,1,1)
     b.Font = Enum.Font.Gotham
-    b.TextSize = 14
     b.MouseButton1Click:Connect(f)
 end
 
--- --- MOVEMENT ---
-addBtn("Advanced Fly", toggleFly, secMain)
-addBtn("Speed (100)", function() player.Character.Humanoid.WalkSpeed = 100 end, secMain)
-addBtn("Normal Speed", function() player.Character.Humanoid.WalkSpeed = 16 end, secMain)
-addBtn("Infinite Jump", function()
-    userInput.JumpRequest:Connect(function()
-        player.Character.Humanoid:ChangeState("Jumping")
-    end)
-end, secMain)
-
--- --- ABUSE ---
-addBtn("Emote: Bang", function()
-    local a = Instance.new("Animation") a.AnimationId = "rbxassetid://148840339"
-    player.Character.Humanoid:LoadAnimation(a):Play()
-end, secAbuse)
-addBtn("Kill Aura (Visual)", function()
-    while task.wait(0.5) do
-        for _, p in pairs(game.Players:GetPlayers()) do
-            if p ~= player and p.Character and (p.Character.Head.Position - player.Character.Head.Position).Magnitude < 20 then
-                local h = Instance.new("Highlight", p.Character)
-                h.FillColor = theme.danger
-                task.wait(0.1)
-                h:Destroy()
+-- Player Admin Logic
+local function updatePlayerList()
+    for _, v in pairs(pPlayers:GetChildren()) do if v:IsA("Frame") then v:Destroy() end end
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p ~= player then
+            local row = Instance.new("Frame", pPlayers)
+            row.Size = UDim2.new(1, -10, 0, 50)
+            row.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            
+            local name = Instance.new("TextLabel", row)
+            name.Size = UDim2.new(0.4, 0, 1, 0)
+            name.Text = p.DisplayName
+            name.TextColor3 = Color3.new(1,1,1)
+            name.BackgroundTransparency = 1
+            
+            local function adminBtn(t, x, color, func)
+                local btn = Instance.new("TextButton", row)
+                btn.Size = UDim2.new(0.18, 0, 0.8, 0)
+                btn.Position = UDim2.new(x, 0, 0.1, 0)
+                btn.Text = t
+                btn.BackgroundColor3 = color
+                btn.MouseButton1Click:Connect(func)
             end
+            
+            adminBtn("TP", 0.42, Color3.fromRGB(0, 150, 0), function() 
+                player.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame 
+            end)
+            adminBtn("KICK", 0.61, Color3.fromRGB(200, 100, 0), function() 
+                sendNotify("Admin HanfmomentV1 KICKED " .. p.Name, theme.danger)
+                pcall(function() p:Destroy() end)
+            end)
+            adminBtn("BAN", 0.8, Color3.fromRGB(150, 0, 0), function() 
+                sendNotify("Admin HanfmomentV1 BANNED " .. p.Name, theme.danger)
+                pcall(function() p:Destroy() end)
+            end)
         end
     end
-end, secAbuse)
+end
 
--- --- PLAYERS ---
-addBtn("Server Hop", function()
-    local x = game:GetService("HttpService"):JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"))
-    for _, s in pairs(x.data) do
-        if s.playing < s.maxPlayers then
-            teleportService:TeleportToPlaceInstance(game.PlaceId, s.id)
-        end
-    end
-end, secPlayer)
-addBtn("Rejoin", function() teleportService:Teleport(game.PlaceId, player) end, secPlayer)
+-- Navigation Buttons
+local function nav(name)
+    local b = Instance.new("TextButton", sideBar)
+    b.Size = UDim2.new(1, 0, 0, 45)
+    b.Text = name:upper()
+    b.BackgroundColor3 = theme.accent
+    b.MouseButton1Click:Connect(function()
+        for _, p in pairs(pages) do p.Visible = false end
+        pages[name].Visible = true
+        if name == "Players" then updatePlayerList() end
+    end)
+end
 
--- [[ F3 TOGGLE ]] --
-userInput.InputBegan:Connect(function(i, g)
-    if not g and i.KeyCode == Enum.KeyCode.F3 then
-        main.Visible = not main.Visible
+nav("Main")
+nav("Players")
+nav("Settings")
+
+-- Main Features
+addBtn("Super Fly + NoClip", toggleFly, pMain)
+addBtn("Auto-Report: OFF", function(b) 
+    autoReport = not autoReport
+    b.Text = autoReport and "Auto-Report: ON" or "Auto-Report: OFF"
+    if autoReport then reportAll() end
+end, pMain)
+addBtn("Voice Chat Bypass", function() 
+    pcall(function() game:GetService("VoiceChatService"):joinVoice() end)
+    sendNotify("Voice Chat Access Forced", theme.gold)
+end, pMain)
+
+-- Login Action
+kBtn.MouseButton1Click:Connect(function()
+    if kBox.Text == "HanfmomentV1" then
+        keyGui:Destroy()
+        mainGui.Enabled = true
+        sendNotify("omamilch V5 Loaded - Welcome HanfmomentV1", theme.gold)
+    else
+        kBox.Text = "INVALID KEY"
+        task.wait(1)
+        kBox.Text = ""
     end
 end)
 
-print("omamilch V5: Trixo Style Loaded for HanfmomentV1")
+-- F3 Toggle
+userInput.InputBegan:Connect(function(i, g)
+    if not g and i.KeyCode == Enum.KeyCode.F3 then mainGui.Enabled = not mainGui.Enabled end
+end)
