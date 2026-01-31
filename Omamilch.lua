@@ -1,108 +1,139 @@
--- [[ omamilch V5 - FINAL REPAIR ]] --
+-- [[ omamilch V5 - TRIXO STYLE ]] --
 -- OWNER: HanfmomentV1
+-- KEY: HanfmomentV1
 
 local player = game.Players.LocalPlayer
 local userInput = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 local TextChatService = game:GetService("TextChatService")
 local starterGui = game:GetService("StarterGui")
+local teleportService = game:GetService("TeleportService")
 
+-- Farbschema
 local theme = {
-    bg = Color3.fromRGB(10, 10, 10),
-    border = Color3.fromRGB(150, 0, 255),
-    accent = Color3.fromRGB(255, 0, 0)
+    main = Color3.fromRGB(15, 15, 15),
+    accent = Color3.fromRGB(150, 0, 255),
+    danger = Color3.fromRGB(255, 0, 0),
+    text = Color3.fromRGB(255, 255, 255)
 }
 
--- ALTE GUIs LÖSCHEN
+-- Vorherige Instanzen säubern
 for _, v in pairs(game.CoreGui:GetChildren()) do
-    if v.Name == "omamilchV5_Ultimate" then v:Destroy() end
+    if v.Name == "omamilch_V5_Final" then v:Destroy() end
 end
 
 local screenGui = Instance.new("ScreenGui", game.CoreGui)
-screenGui.Name = "omamilchV5_Ultimate"
+screenGui.Name = "omamilch_V5_Final"
 screenGui.ResetOnSpawn = false
 
--- --- FIX: CHAT TAG ERROR ---
-pcall(function()
-    if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
-        TextChatService.OnIncomingMessage = function(message)
-            local props = Instance.new("TextChatMessageProperties")
-            if message.TextSource and message.TextSource.UserId == player.UserId then
-                props.PrefixText = "<font color='#FF0000'><b>[OWNER]</b></font> " .. message.PrefixText
+-- [[ FIX: CHAT TAG SAFETY ]] --
+local function setupChat()
+    pcall(function()
+        if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+            TextChatService.OnIncomingMessage = function(message)
+                local props = Instance.new("TextChatMessageProperties")
+                if message.TextSource and message.TextSource.UserId == player.UserId then
+                    props.PrefixText = "<font color='#FF0000'><b>[OWNER]</b></font> " .. message.PrefixText
+                end
+                return props
             end
-            return props -- WICHTIG: Muss immer zurückgegeben werden
         end
-    end
-end)
+    end)
+end
+setupChat()
 
--- --- FENSTER GENERATOR ---
-local function createFrame(name, titleText, size, pos)
-    local f = Instance.new("Frame", screenGui)
-    f.Name = name
-    f.Size = size
-    f.Position = pos
-    f.BackgroundColor3 = theme.bg
-    f.BorderSizePixel = 2
-    f.BorderColor3 = theme.border
-    f.Active = true
-    f.Draggable = true
+-- [[ UI GENERATOR ]] --
+local main = Instance.new("Frame", screenGui)
+main.Size = UDim2.new(0, 500, 0, 350)
+main.Position = UDim2.new(0.5, -250, 0.5, -175)
+main.BackgroundColor3 = theme.main
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
 
-    local t = Instance.new("TextLabel", f)
-    t.Size = UDim2.new(1, 0, 0, 35)
-    t.BackgroundColor3 = theme.border
-    t.Text = titleText
-    t.TextColor3 = Color3.new(1,1,1)
-    t.Font = Enum.Font.SourceSansBold
-    t.TextSize = 18
+-- Glow Effekt
+local glow = Instance.new("Frame", main)
+glow.Size = UDim2.new(1, 4, 1, 4)
+glow.Position = UDim2.new(0, -2, 0, -2)
+glow.BackgroundColor3 = theme.accent
+glow.ZIndex = 0
+
+local titleBar = Instance.new("TextLabel", main)
+titleBar.Size = UDim2.new(1, 0, 0, 40)
+titleBar.BackgroundColor3 = theme.accent
+titleBar.Text = "  omamilch V5 | PREMIER ADMIN - OWNER: " .. player.Name
+titleBar.TextColor3 = theme.text
+titleBar.TextXAlignment = Enum.TextXAlignment.Left
+titleBar.Font = Enum.Font.GothamBold
+titleBar.TextSize = 18
+
+-- Kategorien
+local container = Instance.new("Frame", main)
+container.Size = UDim2.new(1, -10, 1, -50)
+container.Position = UDim2.new(0, 5, 0, 45)
+container.BackgroundTransparency = 1
+
+local list = Instance.new("UIListLayout", container)
+list.FillDirection = Enum.FillDirection.Horizontal
+list.Padding = UDim.new(0, 10)
+
+local function createSection(name)
+    local s = Instance.new("ScrollingFrame", container)
+    s.Size = UDim2.new(0.31, 0, 1, 0)
+    s.BackgroundTransparency = 0.9
+    s.BackgroundColor3 = Color3.new(1,1,1)
+    s.ScrollBarThickness = 2
+    local l = Instance.new("UIListLayout", s)
+    l.Padding = UDim.new(0, 5)
     
-    local c = Instance.new("ScrollingFrame", f)
-    c.Name = "Container"
-    c.Size = UDim2.new(1, -10, 1, -45)
-    c.Position = UDim2.new(0, 5, 0, 40)
-    c.BackgroundTransparency = 1
-    c.ScrollBarThickness = 2
-    Instance.new("UIListLayout", c).Padding = UDim.new(0, 5)
-    
-    return f
+    local t = Instance.new("TextLabel", s)
+    t.Size = UDim2.new(1, 0, 0, 25)
+    t.Text = name:upper()
+    t.TextColor3 = theme.accent
+    t.Font = Enum.Font.GothamBold
+    return s
 end
 
--- --- GUIs ERSTELLEN ---
-local main = createFrame("Main", "[OWNER] MAIN", UDim2.new(0, 200, 0, 300), UDim2.new(0.5, -310, 0.5, -150))
-local speedFrame = createFrame("SpeedGUI", "SPEED SETTINGS", UDim2.new(0, 200, 0, 200), UDim2.new(0.5, -100, 0.5, -100))
-speedFrame.Visible = false
+local secMain = createSection("Movement")
+local secAbuse = createSection("Abuse/Combat")
+local secPlayer = createSection("Players")
 
--- --- FLY & NOCLIP LOGIK ---
+-- [[ FUNKTIONEN ]] --
+
+-- Ultra Fly
 local flying = false
 local noclip = false
-local flySpeed = 80
+local flySpeed = 100
 local bv, bg
 
 local function toggleFly()
     flying = not flying
-    noclip = flying -- NoClip geht mit Fly an/aus
-    local char = player.Character or player.CharacterAdded:Wait()
-    local root = char:WaitForChild("HumanoidRootPart")
-    
+    noclip = flying
     if flying then
+        local root = player.Character.HumanoidRootPart
         bv = Instance.new("BodyVelocity", root)
         bv.MaxForce = Vector3.new(1e6, 1e6, 1e6)
         bg = Instance.new("BodyGyro", root)
         bg.MaxTorque = Vector3.new(1e6, 1e6, 1e6)
-        bg.P = 15000
+        bg.P = 20000
         
         task.spawn(function()
             while flying do
                 local cam = workspace.CurrentCamera.CFrame
-                local dir = Vector3.new(0,0.1,0)
-                if userInput:IsKeyDown(Enum.KeyCode.W) then dir = cam.LookVector
-                elseif userInput:IsKeyDown(Enum.KeyCode.S) then dir = -cam.LookVector end
-                bv.Velocity = (dir.Magnitude > 0.1) and (dir * flySpeed) or Vector3.new(0,0,0)
+                local dir = Vector3.new(0,0,0)
+                if userInput:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.LookVector end
+                if userInput:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.LookVector end
+                if userInput:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.RightVector end
+                if userInput:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.RightVector end
+                
+                bv.Velocity = dir * flySpeed
                 bg.CFrame = cam
-                task.wait()
+                runService.RenderStepped:Wait()
             end
-            if bv then bv:Destroy() end
-            if bg then bg:Destroy() end
         end)
+    else
+        if bv then bv:Destroy() end
+        if bg then bg:Destroy() end
     end
 end
 
@@ -115,59 +146,62 @@ runService.Stepped:Connect(function()
     end
 end)
 
--- --- SPEED SETTINGS ---
-local speedVal = Instance.new("TextBox", speedFrame.Container)
-speedVal.Size = UDim2.new(1, 0, 0, 35)
-speedVal.PlaceholderText = "Zahl eingeben..."
-speedVal.Text = "16"
-speedVal.BackgroundColor3 = Color3.fromRGB(30,30,30)
-speedVal.TextColor3 = Color3.new(1,1,1)
-
-local applySpeed = Instance.new("TextButton", speedFrame.Container)
-applySpeed.Size = UDim2.new(1, 0, 0, 35)
-applySpeed.Text = "SPEED ÜBERNEHMEN"
-applySpeed.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
-applySpeed.MouseButton1Click:Connect(function()
-    player.Character.Humanoid.WalkSpeed = tonumber(speedVal.Text) or 16
-end)
-
-local resetSpeed = Instance.new("TextButton", speedFrame.Container)
-resetSpeed.Size = UDim2.new(1, 0, 0, 35)
-resetSpeed.Text = "STOP / RESET (16)"
-resetSpeed.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-resetSpeed.MouseButton1Click:Connect(function()
-    player.Character.Humanoid.WalkSpeed = 16
-    speedVal.Text = "16"
-end)
-
--- --- MAIN BUTTONS ---
+-- Button Generator
 local function addBtn(txt, f, parent)
-    local b = Instance.new("TextButton", parent or main.Container)
-    b.Size = UDim2.new(1, 0, 0, 35)
+    local b = Instance.new("TextButton", parent)
+    b.Size = UDim2.new(1, -4, 0, 35)
+    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     b.Text = txt
-    b.BackgroundColor3 = Color3.fromRGB(40,40,40)
-    b.TextColor3 = Color3.new(1,1,1)
+    b.TextColor3 = theme.text
+    b.Font = Enum.Font.Gotham
+    b.TextSize = 14
     b.MouseButton1Click:Connect(f)
 end
 
-addBtn("FLY + NOCLIP", toggleFly)
-addBtn("SPEED MENÜ", function() speedFrame.Visible = not speedFrame.Visible end)
-addBtn("EMOTE: BANG (Fixed)", function()
-    local anim = Instance.new("Animation")
-    anim.AnimationId = "rbxassetid://148840339"
-    local load = player.Character.Humanoid:LoadAnimation(anim)
-    load:Play()
-    load:AdjustSpeed(4)
-end)
+-- --- MOVEMENT ---
+addBtn("Advanced Fly", toggleFly, secMain)
+addBtn("Speed (100)", function() player.Character.Humanoid.WalkSpeed = 100 end, secMain)
+addBtn("Normal Speed", function() player.Character.Humanoid.WalkSpeed = 16 end, secMain)
+addBtn("Infinite Jump", function()
+    userInput.JumpRequest:Connect(function()
+        player.Character.Humanoid:ChangeState("Jumping")
+    end)
+end, secMain)
 
--- --- FIX: F3 ZUM ÖFFNEN ---
+-- --- ABUSE ---
+addBtn("Emote: Bang", function()
+    local a = Instance.new("Animation") a.AnimationId = "rbxassetid://148840339"
+    player.Character.Humanoid:LoadAnimation(a):Play()
+end, secAbuse)
+addBtn("Kill Aura (Visual)", function()
+    while task.wait(0.5) do
+        for _, p in pairs(game.Players:GetPlayers()) do
+            if p ~= player and p.Character and (p.Character.Head.Position - player.Character.Head.Position).Magnitude < 20 then
+                local h = Instance.new("Highlight", p.Character)
+                h.FillColor = theme.danger
+                task.wait(0.1)
+                h:Destroy()
+            end
+        end
+    end
+end, secAbuse)
+
+-- --- PLAYERS ---
+addBtn("Server Hop", function()
+    local x = game:GetService("HttpService"):JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"))
+    for _, s in pairs(x.data) do
+        if s.playing < s.maxPlayers then
+            teleportService:TeleportToPlaceInstance(game.PlaceId, s.id)
+        end
+    end
+end, secPlayer)
+addBtn("Rejoin", function() teleportService:Teleport(game.PlaceId, player) end, secPlayer)
+
+-- [[ F3 TOGGLE ]] --
 userInput.InputBegan:Connect(function(i, g)
     if not g and i.KeyCode == Enum.KeyCode.F3 then
         main.Visible = not main.Visible
-        if not main.Visible then 
-            speedFrame.Visible = false 
-        end
     end
 end)
 
-starterGui:SetCore("ChatMakeSystemMessage", {Text = "[omamilch V5] Fixes geladen. F3 zum Ein/Ausblenden.", Color = theme.border})
+print("omamilch V5: Trixo Style Loaded for HanfmomentV1")
