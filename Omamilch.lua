@@ -1,11 +1,10 @@
--- [[ omamilch V5 - ORIGINAL CLASSIC ]] --
+-- [[ omamilch V5 - EXCLUSIVE ]] --
 -- Owner: HanfmomentV1
--- NEW KEY:
+-- FIXED KEY: 
 
 local p = game.Players.LocalPlayer
 local u = game:GetService("UserInputService")
 local r = game:GetService("RunService")
-local t = game:GetService("TextChatService")
 
 local theme = {
     bg = Color3.fromRGB(10, 10, 10),
@@ -14,62 +13,62 @@ local theme = {
     red = Color3.fromRGB(255, 0, 0)
 }
 
--- Reinigung
+-- Vorherige GUIs entfernen
 for _, v in pairs(game.CoreGui:GetChildren()) do
     if v.Name == "omamilchV5_Classic" or v.Name == "omamilch_Key" then v:Destroy() end
 end
 
--- [[ BIG NOTIFY SYSTEM ]] --
+-- [[ GROSSE BENACHRICHTIGUNG ]] --
 local function serverNotify(msg, col)
     local sg = Instance.new("ScreenGui", game.CoreGui)
     local l = Instance.new("TextLabel", sg)
-    l.Size = UDim2.new(1, 0, 0, 120)
+    l.Size = UDim2.new(1, 0, 0, 130)
     l.Position = UDim2.new(0, 0, 0.4, 0)
     l.Text = "⚠️ " .. msg .. " ⚠️"
     l.TextColor3 = col or theme.gold
-    l.TextSize = 55 -- Extra Großer Text
+    l.TextSize = 60 -- Massiver Text
     l.Font = Enum.Font.SourceSansBold
     l.BackgroundTransparency = 1
     l.TextStrokeTransparency = 0
     task.delay(4, function() sg:Destroy() end)
 end
 
--- [[ KEY SYSTEM ]] --
+-- [[ KEY SYSTEM (FIXED PASSWORD) ]] --
 local kg = Instance.new("ScreenGui", game.CoreGui)
 kg.Name = "omamilch_Key"
 local km = Instance.new("Frame", kg)
-km.Size = UDim2.new(0, 350, 0, 200)
-km.Position = UDim2.new(0.5, -175, 0.5, -100)
+km.Size = UDim2.new(0, 380, 0, 220)
+km.Position = UDim2.new(0.5, -190, 0.5, -110)
 km.BackgroundColor3 = theme.bg
 km.BorderSizePixel = 3
 km.BorderColor3 = theme.gold
 
 local ki = Instance.new("TextBox", km)
-ki.Size = UDim2.new(0.8, 0, 0, 50)
+ki.Size = UDim2.new(0.8, 0, 0, 55)
 ki.Position = UDim2.new(0.1, 0, 0.3, 0)
-ki.PlaceholderText = "Hier Key eingeben..."
-ki.Text = "" -- Jetzt komplett leer
-ki.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+ki.PlaceholderText = "Key eingeben..."
+ki.Text = "" -- Leer, damit man ihn eingeben muss
+ki.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 ki.TextColor3 = Color3.new(1,1,1)
-ki.TextSize = 18
+ki.TextSize = 20
 
 local kb = Instance.new("TextButton", km)
-kb.Size = UDim2.new(0.8, 0, 0, 50)
+kb.Size = UDim2.new(0.8, 0, 0, 55)
 kb.Position = UDim2.new(0.1, 0, 0.65, 0)
 kb.Text = "LOGIN"
 kb.BackgroundColor3 = theme.acc
 kb.TextColor3 = Color3.new(1,1,1)
 kb.Font = Enum.Font.SourceSansBold
-kb.TextSize = 20
+kb.TextSize = 22
 
--- [[ MAIN GUI ]] --
+-- [[ HAUPT GUI ]] --
 local mg = Instance.new("ScreenGui", game.CoreGui)
 mg.Name = "omamilchV5_Classic"
 mg.Enabled = false
 
 local main = Instance.new("Frame", mg)
-main.Size = UDim2.new(0, 650, 0, 500) -- Größeres Fenster
-main.Position = UDim2.new(0.5, -325, 0.5, -250)
+main.Size = UDim2.new(0, 680, 0, 520) -- Massive GUI
+main.Position = UDim2.new(0.5, -340, 0.5, -260)
 main.BackgroundColor3 = theme.bg
 main.BorderColor3 = theme.acc
 main.BorderSizePixel = 4
@@ -77,17 +76,17 @@ main.Active = true
 main.Draggable = true
 
 local tit = Instance.new("TextLabel", main)
-tit.Size = UDim2.new(1, 0, 0, 60)
+tit.Size = UDim2.new(1, 0, 0, 70)
 tit.BackgroundColor3 = theme.acc
-tit.Text = "  OMAMILCH V5 - [ADMIN ACCESS]"
+tit.Text = "  OMAMILCH V5 - OWNER LOGIN"
 tit.TextColor3 = Color3.new(1,1,1)
 tit.Font = Enum.Font.SourceSansBold
-tit.TextSize = 28 -- Größerer Titel
+tit.TextSize = 32
 tit.TextXAlignment = Enum.TextXAlignment.Left
 
 local cont = Instance.new("Frame", main)
-cont.Size = UDim2.new(1, -10, 1, -70)
-cont.Position = UDim2.new(0, 5, 0, 65)
+cont.Size = UDim2.new(1, -10, 1, -80)
+cont.Position = UDim2.new(0, 5, 0, 75)
 cont.BackgroundTransparency = 1
 Instance.new("UIListLayout", cont).FillDirection = Enum.FillDirection.Horizontal
 
@@ -95,23 +94,23 @@ local function createCol(name)
     local f = Instance.new("ScrollingFrame", cont)
     f.Size = UDim2.new(0.25, -5, 1, 0)
     f.BackgroundTransparency = 0.95
-    f.ScrollBarThickness = 4
+    f.ScrollBarThickness = 5
     Instance.new("UIListLayout", f).Padding = UDim.new(0, 5)
     local t = Instance.new("TextLabel", f)
-    t.Size = UDim2.new(1, 0, 0, 40)
+    t.Size = UDim2.new(1, 0, 0, 45)
     t.Text = name:upper()
     t.TextColor3 = theme.gold
     t.Font = Enum.Font.SourceSansBold
-    t.TextSize = 18
+    t.TextSize = 20
     return f
 end
 
-local cMove = createCol("Movement")
-local cAdmin = createCol("Teleport")
+local cMove = createCol("Move")
+local cTP = createCol("Teleport")
 local cBan = createCol("Ban-System")
 local cMisc = createCol("Abuse")
 
--- [[ LOGIC ]] --
+-- [[ FUNKTIONEN ]] --
 local flying, noclip = false, false
 local function toggleFly(s)
     flying = s
@@ -124,7 +123,7 @@ local function toggleFly(s)
         bg.MaxTorque = Vector3.new(1e6, 1e6, 1e6)
         task.spawn(function()
             while flying do
-                bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * 120
+                bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * 130
                 bg.CFrame = workspace.CurrentCamera.CFrame
                 r.RenderStepped:Wait()
             end
@@ -143,25 +142,26 @@ end)
 
 local function addBtn(txt, f, pr, col)
     local b = Instance.new("TextButton", pr)
-    b.Size = UDim2.new(1, -5, 0, 40)
-    b.BackgroundColor3 = col or Color3.fromRGB(30, 30, 30)
+    b.Size = UDim2.new(1, -5, 0, 45)
+    b.BackgroundColor3 = col or Color3.fromRGB(35, 35, 35)
     b.Text = txt
     b.TextColor3 = Color3.new(1,1,1)
     b.Font = Enum.Font.SourceSansBold
-    b.TextSize = 17
+    b.TextSize = 19
     b.MouseButton1Click:Connect(f)
 end
 
--- BUTTONS
+-- MOVEMENT
 addBtn("Fly + NoClip", function() toggleFly(not flying) end, cMove)
 addBtn("Speed 150", function() p.Character.Humanoid.WalkSpeed = 150 end, cMove)
 
+-- SPIELER LISTE (TP & BAN)
 local function refresh()
-    for _, v in pairs(cAdmin:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
+    for _, v in pairs(cTP:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
     for _, v in pairs(cBan:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
     for _, pl in pairs(game.Players:GetPlayers()) do
         if pl ~= p then
-            addBtn(pl.DisplayName, function() p.Character.HumanoidRootPart.CFrame = pl.Character.HumanoidRootPart.CFrame end, cAdmin)
+            addBtn(pl.DisplayName, function() p.Character.HumanoidRootPart.CFrame = pl.Character.HumanoidRootPart.CFrame end, cTP)
             addBtn("BAN "..pl.Name, function() 
                 serverNotify("ADMIN HANFMOMENTV1 BANNED "..pl.Name, theme.red)
                 pcall(function() pl:Destroy() end)
@@ -171,14 +171,14 @@ local function refresh()
 end
 task.spawn(function() while task.wait(5) do refresh() end end)
 
-addBtn("Report All Players", function()
+addBtn("Report All", function()
     for _, pl in pairs(game.Players:GetPlayers()) do
         if pl ~= p then pcall(function() p:ReportAbuse(pl, "Bullying", "omamilch V5") end) end
     end
-    serverNotify("REPORTS AN ROBLOX GESENDET", theme.gold)
+    serverNotify("REPORTS GESENDET", theme.gold)
 end, cMisc)
 
--- LOGIN
+-- LOGIN CHECK (DER NEUE KEY)
 kb.MouseButton1Click:Connect(function()
     if ki.Text == "@@25g78D99##44" then
         kg:Destroy()
